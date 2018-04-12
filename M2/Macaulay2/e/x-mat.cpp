@@ -916,6 +916,95 @@ int rawPointArrayLookupOrAppend(PointArray *pa, const MutableMatrix *M, int col)
   return pa->lookup_or_append(getRealVector(M, col));
 }
 
+const Matrix *rawDivisionAlgorithm(const Matrix *f,
+                                   const Matrix *g,
+                                   int strategy)
+{
+  // get the rings we are working over and some constants
+  const Ring *R = f->get_ring();
+  if (R != g->get_ring())
+    {
+      ERROR("matrices have different base rings");
+      return nullptr;
+    }
+  const PolynomialRing *P = R->cast_to_PolynomialRing();
+  if (P == nullptr)
+    {
+      ERROR("matrices not over polynomial ring");
+      return nullptr;
+    }
+  GBRing *GR = P->get_gb_ring();
+  gbvector *zero = nullptr;
+  bool use_denom = (P->getCoefficients() == globalQQ);
+
+  // create a VECTOR of gbvectors from columns of g
+  VECTOR(gbvector *) divisors;
+  for (int c = 0; c < g->n_cols(); c++)
+    {
+      ring_elem denom; // not used, as divisor denom does not change remainder
+      gbvector *divisor = P->translate_gbvector_from_vec(g->rows(), g->elem(c), denom);
+      divisors.push_back(divisor);
+     }
+  
+  // make a new matrix constructor for the result of reducing f
+  MatrixConstructor mat(f->rows(), f->n_cols());
+  
+  // iterate through columns of f
+  for (int c = 0; c < f->n_cols(); c++)
+    {
+      // reduce this column (as h) to remainder r
+      ring_elem denom;
+      gbvector *h = P->translate_gbvector_from_vec(f->rows(), f->elem(c), denom);
+      gbvector *r = nullptr;
+      gbvector *rtail = nullptr; // points to last term in r
+
+      while (!GR->gbvector_is_zero(h))
+        {
+          // try to find a divisor and reduce by it if found
+          bool found_divisor = false;
+          for (int i = 0; i < g->n_cols(); i++)
+            {
+              if ((divisors[i]->comp == h->comp) &&
+                  (GR->get_flattened_monoid()->divides(divisors[i]->monom, h->monom)))
+                {
+                  GR->gbvector_reduce_lead_term(f->rows(),
+                                                nullptr,
+                                                r,
+                                                h,
+                                                zero,
+                                                divisors[i],
+                                                zero,
+                                                use_denom,
+                                                denom);
+                  found_divisor = true;
+                  break;
+                }
+            }
+
+          // if no reduction happened, remove lead term from h and add it to end of r
+          if (!found_divisor)
+            {
+              if (rtail == nullptr)
+                {
+                  r = h;
+                  rtail = h;
+                }
+              else
+                {
+                  rtail->next = h;
+                  rtail = h;
+                }
+              h = h->next;
+              rtail->next = nullptr;
+            }
+        }
+
+      mat.set_column(c, P->translate_gbvector_to_vec_denom(f->rows(), r, denom));
+    }
+  
+  return mat.to_matrix();
+}
+
 // Local Variables:
 // compile-command: "make -C $M2BUILDDIR/Macaulay2/e "
 // indent-tabs-mode: nil

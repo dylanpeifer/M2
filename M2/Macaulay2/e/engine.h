@@ -1895,8 +1895,17 @@ enum gbTraceValues
   // f should be a matrix in the polynomial ring R (over ZZ).
   // RQ should be the same ring as R, but with rational coefficients
 
+  /**************************************************/
+  /**** Division Algorithm **************************/
+  /**************************************************/
 
-
+  const Matrix * rawDivisionAlgorithm(const Matrix *f,
+                                      const Matrix *g,
+                                      int strategy);
+  /* Reduce every column of f with respect to the columns of g. Currently strategy
+     is ignored.
+  */
+  
   /**************************************************/
   /**** Fraction free LU decomposition **************/
   /**************************************************/

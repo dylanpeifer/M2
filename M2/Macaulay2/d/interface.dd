@@ -4360,6 +4360,27 @@ export rawIsLocalUnit(e:Expr):Expr := (                             -- true for 
   );
 setupfun("rawIsLocalUnit",rawIsLocalUnit);
 
+export rawDivisionAlgorithm(e:Expr):Expr := (
+  when e is s:Sequence do (
+  if length(s) == 3 then (
+  when s.0 is wf:RawMatrixCell do (f := wf.p;
+  when s.1 is wg:RawMatrixCell do (g := wg.p;
+  when s.2 is wstrategy:ZZcell do (
+  if isInt(wstrategy) then (strategy := toInt(wstrategy);
+    toExpr(Ccode(RawMatrixOrNull,
+      "rawDivisionAlgorithm(",
+        f, ",", g, ",", strategy, 
+      ")"
+    ))
+  ) else WrongArgSmallInteger(2)
+  ) else WrongArgZZ(2)
+  ) else WrongArg(1,"a raw matrix")
+  ) else WrongArg(0,"a raw matrix")
+  ) else WrongNumArgs(3)
+  ) else WrongNumArgs(3)
+  );
+setupfun("rawDivisionAlgorithm",rawDivisionAlgorithm);
+
 -- Local Variables:
 -- compile-command: "echo \"make: Entering directory \\`$M2BUILDDIR/Macaulay2/d'\" && make -C $M2BUILDDIR/Macaulay2/d interface.o "
 -- End:
