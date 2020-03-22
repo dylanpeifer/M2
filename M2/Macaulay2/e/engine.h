@@ -1899,9 +1899,9 @@ enum gbTraceValues
   /**** Division Algorithm **************************/
   /**************************************************/
 
-  const Matrix * rawDivisionAlgorithm(const Matrix *f,
-                                      const Matrix *g,
-                                      int strategy);
+  const engine_RawMatrixArrayIntPair rawDivisionAlgorithm(const Matrix *f,
+                                                          const Matrix *g,
+                                                          int strategy);
   /* Reduce every column of f with respect to the columns of g. Currently strategy
      is ignored.
   */

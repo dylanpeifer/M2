@@ -916,9 +916,9 @@ int rawPointArrayLookupOrAppend(PointArray *pa, const MutableMatrix *M, int col)
   return pa->lookup_or_append(getRealVector(M, col));
 }
 
-const Matrix *rawDivisionAlgorithm(const Matrix *f,
-                                   const Matrix *g,
-                                   int strategy)
+const engine_RawMatrixArrayIntPair rawDivisionAlgorithm(const Matrix *f,
+                                                        const Matrix *g,
+                                                        int strategy)
 {
   // get the rings we are working over and some constants
   const Ring *R = f->get_ring();
@@ -1001,8 +1001,16 @@ const Matrix *rawDivisionAlgorithm(const Matrix *f,
 
       mat.set_column(c, P->translate_gbvector_to_vec_denom(f->rows(), r, denom));
     }
-  
-  return mat.to_matrix();
+
+  M2_arrayint stats = M2_makearrayint(2);
+  stats->array[0] = 13;
+  stats->array[1] = 17;
+
+  engine_RawMatrixArrayIntPair result = new engine_RawMatrixArrayIntPair_struct;
+  result->a = mat.to_matrix();
+  result->b = stats;
+
+  return result;
 }
 
 // Local Variables:

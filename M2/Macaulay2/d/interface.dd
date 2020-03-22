@@ -4367,7 +4367,7 @@ export rawDivisionAlgorithm(e:Expr):Expr := (
   when s.1 is wg:RawMatrixCell do (g := wg.p;
   when s.2 is wstrategy:ZZcell do (
   if isInt(wstrategy) then (strategy := toInt(wstrategy);
-    toExpr(Ccode(RawMatrixOrNull,
+    toExpr(Ccode(RawMatrixArrayIntPairOrNull,
       "rawDivisionAlgorithm(",
         f, ",", g, ",", strategy, 
       ")"

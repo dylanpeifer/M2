@@ -49,6 +49,8 @@ export RawArrayIntPairOrNull := RawArrayIntPair or null;
 
 export RawMatrixPair := { a:RawMatrix, b:RawMatrix };
 export RawMatrixPairOrNull := RawMatrixPair or null;
+export RawMatrixArrayIntPair := { a:RawMatrix, b:RawArrayInt };
+export RawMatrixArrayIntPairOrNull := RawMatrixArrayIntPair or null;
 export RawMatrixArray := array(RawMatrix);
 export RawMatrixArrayOrNull := array(RawMatrix) or null;
 export RawMutableMatrixArray := array(RawMutableMatrix);

@@ -262,6 +262,12 @@ export toExpr(x:QQorNull):Expr := when x is i:QQ do Expr(QQcell(i)) is null do e
 export toExpr(x:RRorNull):Expr := when x is i:RR do Expr(RRcell(i)) is null do engineErrorMessage();
 export toExpr(x:CCorNull):Expr := when x is i:CC do Expr(CCcell(i)) is null do engineErrorMessage();
 export toExpr(x:RawMatrixPairOrNull):Expr := when x is p:RawMatrixPair do seq(Expr(RawMatrixCell(p.a)),Expr(RawMatrixCell(p.b))) is null do engineErrorMessage();
+export toExpr(x:RawMatrixArrayIntPairOrNull):Expr := (
+    when x
+    is p:RawMatrixArrayIntPair do
+        seq(Expr(RawMatrixCell(p.a)),toExpr(p.b))
+    is null do engineErrorMessage()
+    );
 export toExpr(x:RawMatrixArray):Expr := Expr( list( new Sequence len length(x) do foreach m in x do provide Expr(RawMatrixCell(m)) ) );
 export toExpr(x:RawMatrixArrayOrNull):Expr := when x is r:RawMatrixArray do toExpr(r) is null do engineErrorMessage();
 export toExpr(x:RawMutableMatrixArray):Expr := Expr( list( new Sequence len length(x) do foreach m in x do provide Expr(RawMutableMatrixCell(m)) ) );
