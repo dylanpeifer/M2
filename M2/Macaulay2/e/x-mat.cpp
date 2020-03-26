@@ -948,6 +948,8 @@ const engine_RawMatrixArrayIntPair rawDivisionAlgorithm(const Matrix *f,
   
   // make a new matrix constructor for the result of reducing f
   MatrixConstructor mat(f->rows(), f->n_cols());
+
+  int polynomial_additions = 0;
   
   // iterate through columns of f
   for (int c = 0; c < f->n_cols(); c++)
@@ -977,6 +979,7 @@ const engine_RawMatrixArrayIntPair rawDivisionAlgorithm(const Matrix *f,
                                                 use_denom,
                                                 denom);
                   found_divisor = true;
+                  polynomial_additions++;
                   break;
                 }
             }
@@ -1003,7 +1006,7 @@ const engine_RawMatrixArrayIntPair rawDivisionAlgorithm(const Matrix *f,
     }
 
   M2_arrayint stats = M2_makearrayint(2);
-  stats->array[0] = 13;
+  stats->array[0] = polynomial_additions;
   stats->array[1] = 17;
 
   engine_RawMatrixArrayIntPair result = new engine_RawMatrixArrayIntPair_struct;
