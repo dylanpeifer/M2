@@ -117,8 +117,7 @@ if(ETAGS)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/TAGS
     COMMENT "Generating d/TAGS file"
     COMMAND ${ETAGS} -o TAGS ${CLIST} ${DLIST}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 ###############################################################################
@@ -140,8 +139,7 @@ endforeach()
 # for that reason, interpreter cannot be compiled as a static library, yet
 add_library(M2-interpreter OBJECT ${CLIST} ${TAGS}
   $<$<BOOL:${WITH_XML}>:xml-c.c xml-c.h>
-  $<$<BOOL:${WITH_PYTHON}>:python-c.c>
-  )
+  $<$<BOOL:${WITH_PYTHON}>:python-c.c>)
 
 target_link_libraries(M2-interpreter PRIVATE M2-supervisor M2-regex) # scclib.c uses regex
 
@@ -159,9 +157,9 @@ target_include_directories(M2-interpreter
     ${Python3_INCLUDE_DIRS}
   )
 
-foreach(LIB IN LISTS LIBRARY_LIST)
+foreach(LIB IN LISTS PKGLIB_LIST)
   if(${LIB}_FOUND)
-    target_link_libraries(M2-interpreter PUBLIC ${${LIB}_LIBRARY})
+    target_link_libraries(M2-interpreter PUBLIC PkgConfig::${LIB})
   endif()
 endforeach()
 
@@ -172,11 +170,15 @@ foreach(LIB IN LISTS LIBRARIES_LIST)
   endif()
 endforeach()
 
-foreach(LIB IN LISTS PKGLIB_LIST)
+foreach(LIB IN LISTS LIBRARY_LIST)
   if(${LIB}_FOUND)
-    target_link_libraries(M2-interpreter PUBLIC PkgConfig::${LIB})
+    target_link_libraries(M2-interpreter PUBLIC ${${LIB}_LIBRARY})
+    target_include_directories(M2-interpreter PRIVATE ${${LIB}_INCLUDE_DIR})
   endif()
 endforeach()
+
+# FIXME: simply this for Mac users
+target_include_directories(M2-interpreter PRIVATE $<$<BOOL:${APPLE}>:${ATOMIC_OPS_INCLUDE_DIR}>)
 
 # Compiler warning flags
 target_compile_options(M2-interpreter PRIVATE
